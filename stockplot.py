@@ -10,7 +10,8 @@ from matplotlib import cm
 
 plt.style.use('ggplot')
 
-YESTERDAY = (datetime.datetime.today() - datetime.timedelta(1)).strftime("%Y-%m-%d")
+YESTERDAY = '2019-12-06'
+# YESTERDAY = (datetime.datetime.today() - datetime.timedelta(1)).strftime("%Y-%m-%d")
 SECTORID = "a39901011g000000"
 fmt = "date={TODAY};sectorid={SECTORID}"
 # 获取申万一级行业代码
@@ -33,11 +34,17 @@ daily_data_last['PCT_CHANGE_5D'] = (daily_data_last['CLOSE'] / daily_data_first[
 daily_data_cmp = daily_data_last[['date', 'sec_name', 'CLOSE', 'PCT_CHG', 'PCT_CHANGE_5D', 'FREE_TURN_N', 'VOL_MUL']]
 daily_data_cmp['sec'] = daily_data_cmp['sec_name'].map(lambda x: x.split("(")[0])
 
-s = daily_data_cmp['VOL_MUL'] * 5
-c = daily_data_cmp['FREE_TURN_N']
+s = daily_data_cmp['FREE_TURN_N'] ** 2 * 100
+c = daily_data_cmp['VOL_MUL']
+xlim = daily_data_cmp['PCT_CHG'].abs().max()+0.5
+ylim = daily_data_cmp['PCT_CHANGE_5D'].abs().max()+0.5
 plt.rcParams['font.sans-serif'] = ['SimHei']
 plt.rcParams['axes.unicode_minus'] = False
-plt.scatter(daily_data_cmp['PCT_CHG'], daily_data_cmp['PCT_CHANGE_5D'], s=s, c=c, cmap=cm.Reds)
+plt.scatter(daily_data_cmp['PCT_CHG'], daily_data_cmp['PCT_CHANGE_5D'], s=s, c=c, cmap=cm.PuRd)
 for i in range(len(daily_data_cmp)):
     plt.annotate(daily_data_cmp['sec'][i], xy=(daily_data_cmp['PCT_CHG'][i], daily_data_cmp['PCT_CHANGE_5D'][i]),
-                 xytext=(daily_data_cmp['PCT_CHG'][i] + 0.01, daily_data_cmp['PCT_CHANGE_5D'][i] + 0.01))
+                 xytext=(daily_data_cmp['PCT_CHG'][i] + 0.01, daily_data_cmp['PCT_CHANGE_5D'][i] + 0.01), fontsize=8)
+plt.xlabel('PCT_CHG')
+plt.ylabel('PCT_CHANGE_5D')
+plt.xlim(-xlim, xlim)
+plt.ylim(-ylim, ylim)
